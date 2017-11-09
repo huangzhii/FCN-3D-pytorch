@@ -17,13 +17,11 @@ def happyprint(string, obj):
     return
 
 
-class DentalClassSegBase(data.Dataset):
+class Data2Dbase(data.Dataset):
 
     class_names = np.array([
         'bg',
-        '1',
-        '2',
-        '3'
+        'obj'
     ])
 
     def __init__(self, root, split='train', transform=False):
@@ -47,17 +45,30 @@ class DentalClassSegBase(data.Dataset):
         data_file = self.files[self.split][index]
         # load image
         img_file = data_file['img']
-        img = PIL.Image.open(img_file)
-        img = np.array(img, dtype=np.uint8)
-        # load label
         lbl_file = data_file['lbl']
-        lbl = PIL.Image.open(lbl_file)
-        lbl = np.array(lbl, dtype=np.int32)
-        # print("get unique values of lbl", np.unique(lbl))
-        if self._transform:
-            return self.transform(img, lbl)
-        else:
-            return img, lbl
+
+        img = np.zeros((200,200))
+        lbl = np.zeros((200,200))
+        for i in range(50,150):
+            for j in range(50,150):
+                img[i,j] = 255
+                lbl[i,j] = 1
+
+        for i in range(0,200):
+            for j in range(0,200):
+                img[i,j] = np.random.normal(img[i,j], 80, 1)
+                if img[i,j] < 0:
+                    img[i,j] = 0
+                if img[i,j] > 255:
+                    img[i,j] = 255
+        img = np.expand_dims(img, axis=0)
+        img = torch.from_numpy(img).float()
+        lbl = torch.from_numpy(lbl).long()
+
+        # plt.imshow(img[:,:,50])
+        # plt.title('image')
+        # plt.pause(1)
+        return img, lbl
 
     def transform(self, img, lbl):
         img = img[:, :, ::-1]  # RGB -> BGR
@@ -78,10 +89,10 @@ class DentalClassSegBase(data.Dataset):
         return img, lbl
 
 
-class DentalClassSegValidate(DentalClassSegBase):
+class Data2DVal(Data2Dbase):
 
     def __init__(self, root, split='validation', transform=False):
-        super(DentalClassSegValidate, self).__init__(
+        super().__init__(
             root, split=split, transform=transform)
         dataset_dir = self.root
         imgsets_file = osp.join(dataset_dir, 'test2.txt')
@@ -91,6 +102,6 @@ class DentalClassSegValidate(DentalClassSegBase):
             lbl_file = osp.join(dataset_dir, 'labels/%s.png' % did)
             self.files['validation'].append({'img': img_file, 'lbl': lbl_file})
 
-class DentalClassSeg(DentalClassSegBase):
+class Data2D(Data2Dbase):
     def __init__(self, root, split='train', transform=False):
-        super(DentalClassSeg, self).__init__(root, split=split, transform=transform)
+        super().__init__(root, split=split, transform=transform)
