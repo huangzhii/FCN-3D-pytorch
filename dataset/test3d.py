@@ -46,19 +46,25 @@ class Data3Dbase(data.Dataset):
         # load image
         img_file = data_file['img']
         lbl_file = data_file['lbl']
-
-        img = np.zeros((60,60,60))
-        lbl = np.zeros((60,60,60))
+        dim = 100
+        img = np.zeros((dim,dim,dim))
+        lbl = np.zeros((dim,dim,dim))
         for i in range(20,40):
             for j in range(20,40):
                 for k in range(20,40):
                     img[i,j,k] = 255
                     lbl[i,j,k] = 1
 
-        for i in range(0,60):
-            for j in range(0,60):
-                for k in range(0,60):
-                    img[i,j,k] = np.random.normal(img[i,j,k], 80, 1)
+        for i in range(60,70):
+            for j in range(70,80):
+                for k in range(0,100):
+                    img[i,j,k] = 255
+                    lbl[i,j,k] = 1
+
+        for i in range(0,dim):
+            for j in range(0,dim):
+                for k in range(0,dim):
+                    img[i,j,k] = np.random.normal(img[i,j,k], 50, 1)
                     if img[i,j,k] < 0:
                         img[i,j,k] = 0
                     if img[i,j,k] > 255:
